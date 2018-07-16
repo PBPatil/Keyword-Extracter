@@ -1,0 +1,249 @@
+Java Basics
+
+Topics in this section include:
+What makes Java programs portable, secure, and robust
+The structure of Java applets and applications
+How Java applications are executed
+How applets are invoked and executed
+The Java Language, Part I
+Comments
+Declarations
+Expressions
+Statements
+Garbage collection
+Java Semantics
+
+Portability
+
+Java programs are portable across operating systems and hardware environments.
+Portability is to your advantage because:
+You need only one version of your software to serve a broad market.
+The Internet, in effect, becomes one giant, dynamic library.
+You are no longer limited by your particular computer platform.
+Three features make Java String programs portable:
+1. The language. The Java language is completely specified; all data-type sizes and
+formats are defined as part of the language. By contrast, C/C++ leaves these
+"details" up to the compiler implementor, and many C/C++ programs therefore
+
+Java Basics
+
+Java Basics -2 © 1996-2003 jGuru.com. All Rights Reserved.
+
+are not portable.
+2. The library. The Java class library is available on any machine with a Java
+runtime system, because a portable program is of no use if you cannot use the
+same class library on every platform. Window-manager function calls in a Mac
+application written in C/C++, for example, do not port well to a PC.
+3. The byte code. The Java runtime system does not compile your source code
+directly into machine language, an inflexible and nonportable representation of
+your program. Instead, Java programs are translated into machine-independent
+byte code. The byte code is easily interpreted and therefore can be executed on
+any platform having a Java runtime system. (The latest versions of the Netscape
+Navigator browser, for example, can run applets on virtually any platform).
+
+Security
+
+The Java language is secure in that it is very difficult to write incorrect code or
+viruses that can corrupt/steal your data, or harm hardware such as hard disks.
+There are two main lines of defense:
+Interpreter level:
+No pointer arithmetic
+Garbage collection
+Array bounds checking
+No illegal data conversions
+Browser level (applies to applets only):
+No local file I/O
+Sockets back to host only
+No calls to native methods
+
+Robustness
+
+The Java language is robust. It has several features designed to avoid crashes
+during program execution, including:
+No pointer arithmetic
+
+Java Basics
+
+© 1996-2003 jGuru.com. All Rights Reserved. Java Basics -3
+
+Garbage collection--no bad addresses
+Array and string bounds checking
+No jumping to bad method addresses
+Interfaces and exceptions
+Java Program Structure
+
+A file containing Java source code is considered a compilation unit. Such a
+compilation unit contains a set of classes and, optionally, a package definition to
+group related classes together. Classes contain data and method members that
+specify the state and behavior of the objects in your program.
+Java programs come in two flavors:
+Standalone applications that have no initial context such as a pre-existing main
+window
+Applets for WWW programming
+The major differences between applications and applets are:
+Applets are not allowed to use file I/O and sockets (other than to the host
+platform). Applications do not have these restrictions.
+An applet must be a subclass of the Java Applet class. Aplications do not need to
+subclass any particular class.
+Unlike applets, applications can have menus.
+Unlike applications, applets need to respond to predefined lifecycle messages
+from the WWW browser in which they're running.
+
+Java Program Execution
+
+The Java byte-code compiler translates a Java source file into machine-
+independent byte code. The byte code for each publicly visible class is placed in a
+
+separate file, so that the Java runtime system can easily find it. If your program
+instantiates an object of class A, for example, the class loader searches the
+directories listed in your CLASSPATH environment variable for a file called A.class
+that contains the class definition and byte code for class A.
+There is no link phase for Java programs; all linking is done dynamically at
+
+Java Basics
+
+Java Basics -4 © 1996-2003 jGuru.com. All Rights Reserved.
+
+runtime.
+The following diagram shows an example of the Java compilation and execution
+sequence for a source file named A.java containing public class A and non-public
+class B:
+
+Java programs are, in effect, distributed applications. You may think of them as a
+collection of DLLs (dynamically loadable libraries) that are linked on demand at
+runtime. When you write your own Java applications, you will often integrate
+your program with already-existing portions of code that reside on other
+
+machines.
+
+A Simple Application
+
+Consider the following trivial application that prints "hi there" to standard
+output:
+
+Java Basics
+
+© 1996-2003 jGuru.com. All Rights Reserved. Java Basics -5
+
+public class TrivialApplication {
+// args[0] is first argument
+// args[1] the second
+public static void main(String args[]) {
+System.out.println("hi there");
+}
+}
+The command java TrivialApplication tells the Java runtime system to begin
+with the class file TrivialApplication.class and to look in that file for a
+method with the signature:
+public static void main(String args[]);
+The main() method will always reside in one of your class files. The Java
+language does not allow methods outside of class definitions. The class, in effect,
+creates scoped symbol StartingClassName.main for your main() method.
+
+Applet Execution
+
+An applet is a Java program that runs within a Java-compatible WWW browser or
+in an appletviewer. To execute your applet, the browser:
+Creates an instance of your applet
+Sends messages to your applet to automatically invoke predefined lifecycle
+methods
+The predefined methods automatically invoked by the runtime system are:
+init(). This method takes the place of the Applet constructor and is only called
+once during applet creation. Instance variables should be initialized in this method.
+GUI components such as buttons and scrollbars should be added to the GUI in
+this method.
+start(). This method is called once after init() and whenever your applet is
+revisited by your browser, or when you deiconify your browser. This method
+should be used to start animations and other threads.
+paint(Graphics g). This method is called when the applet drawing area needs
+to be redrawn. Anything not drawn by contained components must be drawn in
+this method. Bitmaps, for example, are drawn here, but buttons are not because
+they handle their own painting.
+stop(). This method is called when you leave an applet or when you iconify
+your browser. The method should be used to suspend animations and other
+
+Java Basics
+
+Java Basics -6 © 1996-2003 jGuru.com. All Rights Reserved.
+threads so they do not burden system resources unnecessarily. It is guaranteed to
+be called before destroy().
+destroy(). This method is called when an applet terminates, for example, when
+quitting the browser. Final clean-up operations such as freeing up system
+resources with dispose() should be done here. The dispose() method of Frame
+removes the menu bar. Therefore, do not forget to call super.dispose() if you
+override the default behavior.
+The basic structure of an applet that uses each of these predefined methods is:
+import java.applet.Applet;
+// include all AWT class definitions
+import java.awt.*;
+public class AppletTemplate extends Applet {
+public void init() {
+// create GUI, initialize applet
+}
+public void start() {
+// start threads, animations etc...
+}
+public void paint(Graphics g) {
+// draw things in g
+}
+public void stop() {
+// suspend threads, stop animations etc...
+}
+public void destroy() {
+// free up system resources, stop threads
+}
+}
+All you have to do is fill in the appropriate methods to bring your applet to life. If
+you don't need to use one or more of these predefined methods, simply leave them
+out of your applet. The applet will ignore messages from the browser attempting
+to invoke any of these methods that you don't use.
+
+A Simple Applet
+
+The following complete applet displays "Hello, World Wide Web!" in your
+browser window:
+import java.applet.Applet;
+import java.awt.Graphics;
+public class TrivialApplet extends Applet {
+public void paint(Graphics g) {
+// display a string at 20,20
+
+Java Basics
+
+© 1996-2003 jGuru.com. All Rights Reserved. Java Basics -7
+
+// where 0,0 is the upper-left corner
+g.drawString("Hello, World Wide Web!", 20, 20);
+}
+}
+An appletviewer may be used instead of a WWW browser to test applets. For
+example, the output of TrivialApplet on an appletviewer looks like:
+
+HTML/Applet Interface
+
+The HTML applet tag is similar to the HTML img tag, and has the form:
+<applet code=AppletName.class width=w height=h>
+[parameters]
+</applet>
+where the optional parameters are a list of parameter definitions of the form:
+<param name=n value=v>
+An example tag with parameter definitions is:
+<applet code=AppletName.class width=300 height=200>
+<param name=p1 value=34>
+<param name=p2 value="test">
+</applet>
+where p1 and p2 are user-defined parameters.
+The code, width, and height parameters are mandatory. The parameters
+codebase, alt, archives, align, vspace, and hspace are optional within the
+<applet> tag itself. Your applet can access any of these parameters by calling:
+Applet.getParameter("p")
+which returns the String value of the parameter. For example, the applet:
+import java.applet.Applet;
+public class ParamTest extends Applet {
+public void init() {
+System.out.println("width is " + getParameter("width"));
+System.out.println("p1 is " + getParameter("p1"));
+
+Java Basics
+
+Java Basics -8 © 1996-2003 jGuru.com. All Rights Reserved.
